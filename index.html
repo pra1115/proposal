@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For Pranjal 💖</title>
+
+<style>
+body{
+ margin:0;
+ height:100vh;
+ background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+ display:flex;
+ justify-content:center;
+ align-items:center;
+ font-family:'Comic Sans MS', cursive;
+ overflow:hidden;
+}
+
+.card{
+ background:white;
+ padding:30px;
+ border-radius:25px;
+ text-align:center;
+ width:90%;
+ max-width:450px;
+ box-shadow:0 15px 40px rgba(0,0,0,0.2);
+ animation:pop .8s ease;
+ position:relative;
+}
+@keyframes pop{from{transform:scale(0);}to{transform:scale(1);}}
+
+h1{color:#ff4081;}
+
+button{
+ padding:12px 25px;
+ font-size:18px;
+ border:none;
+ border-radius:25px;
+ cursor:pointer;
+ margin:10px;
+}
+
+.yes{background:#ff4081;color:white;}
+.no{
+ background:#ddd;
+ color:#555;
+ position:absolute;
+}
+
+.sound{background:#4caf50;color:white;}
+
+canvas{
+ position:fixed;
+ top:0;
+ left:0;
+ pointer-events:none;
+ z-index:-1;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card" id="card">
+ <h1>Hey Pranjal 😌</h1>
+ <p>This is Prashasti… I made something special just for you 💖</p>
+ <button class="sound" onclick="enableSound()">🔊 Enable Sound</button>
+</div>
+
+<!-- 🎵 Background song (YOU upload love.mp3) -->
+<audio id="bgMusic" loop>
+ <source src="love.mp3" type="audio/mpeg">
+</audio>
+
+<!-- 🔘 Button click sound -->
+<audio id="clickSound">
+ <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_91f93a1b7c.mp3">
+</audio>
+
+<!-- 🎆 Fireworks sound -->
+<audio id="boomSound">
+ <source src="https://cdn.pixabay.com/download/audio/2021/08/04/audio_5c76d2c2f7.mp3">
+</audio>
+
+<script>
+const questions = [
+ "Do you like talking to me? 😊",
+ "Do I make your day brighter? 🌷",
+ "Do you feel calm when you’re with me? 🤍",
+ "Will you be my Valentine? 💘",
+ "Can I hold your hand forever? 🥹",
+ "Will you choose me every single day? 🌈",
+ "Do you see a future with me? 💞",
+ "Pranjal… will you marry me? 💍"
+];
+
+let i = 0;
+
+function enableSound(){
+ const bg = document.getElementById("bgMusic");
+ bg.volume = 0.6;
+ bg.play();
+ showQuestion();
+}
+
+function showQuestion(){
+ document.getElementById("clickSound").play();
+
+ if(i < questions.length){
+  card.innerHTML = `
+   <h1>Question ${i+1}</h1>
+   <p>${questions[i]}</p>
+   <button class="yes" onclick="next()">Yes 💖</button>
+   <button class="no" id="noBtn" onmouseover="moveNo()">No 🙃</button>
+  `;
+ } else {
+  finish();
+ }
+}
+
+function next(){
+ i++;
+ showQuestion();
+}
+
+function moveNo(){
+ const btn = document.getElementById("noBtn");
+ const x = Math.random() * (window.innerWidth - 150);
+ const y = Math.random() * (window.innerHeight - 100);
+ btn.style.left = x + "px";
+ btn.style.top = y + "px";
+}
+
+function finish(){
+ document.getElementById("boomSound").play();
+
+ document.body.innerHTML = `
+ <div class="card">
+  <h1>Forever Us 💖</h1>
+  <p><i>
+   I promise to choose you, love you, and stand by you forever 💕
+  </i></p>
+  <p>— Prashasti</p>
+ </div>
+ <canvas id="fireworks"></canvas>
+ `;
+ startFireworks();
+}
+
+/* 🎆 FIREWORKS */
+function startFireworks(){
+ const canvas = document.getElementById("fireworks");
+ const ctx = canvas.getContext("2d");
+ canvas.width = innerWidth;
+ canvas.height = innerHeight;
+
+ let fireworks = [];
+
+ function Firework(){
+  this.x = Math.random()*canvas.width;
+  this.y = canvas.height;
+  this.ty = Math.random()*canvas.height/2;
+  this.c = `hsl(${Math.random()*360},100%,60%)`;
+  this.e = false;
+  this.p = [];
+ }
+
+ Firework.prototype.update = function(){
+  if(!this.e){
+   this.y -= 8;
+   if(this.y <= this.ty){
+    this.e = true;
+    for(let i=0;i<40;i++){
+     this.p.push({
+      x:this.x,y:this.y,
+      vx:(Math.random()-0.5)*6,
+      vy:(Math.random()-0.5)*6,
+      a:1
+     });
+    }
+   }
+  } else {
+   this.p.forEach(o=>{
+    o.x+=o.vx; o.y+=o.vy; o.a-=0.02;
+   });
+  }
+ };
+
+ Firework.prototype.draw = function(){
+  if(!this.e){
+   ctx.fillStyle=this.c;
+   ctx.fillRect(this.x,this.y,4,4);
+  } else {
+   this.p.forEach(o=>{
+    ctx.fillStyle=this.c.replace(")",`,${o.a})`).replace("hsl","hsla");
+    ctx.fillRect(o.x,o.y,3,3);
+   });
+  }
+ };
+
+ function loop(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(Math.random()<0.05) fireworks.push(new Firework());
+  fireworks.forEach(f=>{f.update();f.draw();});
+  fireworks = fireworks.filter(f=>!f.e || f.p.some(o=>o.a>0));
+  requestAnimationFrame(loop);
+ }
+ loop();
+}
+</script>
+
+</body>
+</html>
